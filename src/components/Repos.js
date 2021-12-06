@@ -5,6 +5,7 @@ import { ExampleChart, Pie3D, Column3D, Bar3D, Doughnut2D } from "./Charts";
 const Repos = () => {
   const { repos } = React.useContext(GithubContext);
 
+  // piechar and doughnut
   const pieChart = (data) => {
     let obj = {};
     data.map((item) => {
@@ -13,28 +14,49 @@ const Repos = () => {
           ? (obj[item.language] = {
               ...obj[item.language],
               value: obj[item.language].value + 1,
+              stars: obj[item.language].stars + item.stargazers_count,
             })
-          : (obj[item.language] = { label: item.language, value: 1 });
-      } else {
-        obj["Others"]
-          ? (obj["Others"] = {
-              ...obj["Others"],
-              value: obj["Others"].value + 1,
-            })
-          : (obj["Others"] = {
-              label: "Others",
+          : (obj[item.language] = {
+              label: item.language,
               value: 1,
+              stars: item.stargazers_count,
             });
+      } else {
+        return;
       }
     });
 
     return Object.values(obj).sort((a, b) => b.value - a.value);
   };
 
+  const doughnutData = pieChart(repos)
+    .map((item) => {
+      return { label: item.label, value: item.stars };
+    })
+    .sort((a, b) => b.value - a.value);
+
+  // stars, forks
+  let { stars, forks } = repos.reduce(
+    (total, item) => {
+      const { stargazers_count, name, forks } = item;
+      total.stars[stargazers_count] = { label: name, value: stargazers_count };
+      total.forks[forks] = { label: name, value: forks };
+      return total;
+    },
+    { stars: {}, forks: {} }
+  );
+
+  stars = Object.values(stars).slice(-5).reverse();
+
+  forks = Object.values(forks).slice(-5).reverse();
+
   return (
     <section className="section">
       <Wrapper className="section-center">
         <Pie3D data={pieChart(repos)} />
+        <Column3D data={stars} />
+        <Doughnut2D data={doughnutData} />
+        <Bar3D data={forks} />
       </Wrapper>
     </section>
   );

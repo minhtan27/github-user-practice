@@ -1,23 +1,26 @@
 import React from "react";
 import { Dashboard, Login, PrivateRoute, AuthWrapper, Error } from "./pages";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { Auth0Provider } from "@auth0/auth0-react";
 
 function App() {
   return (
     <div>
-      <Router>
-        <Switch>
-          <Route path="/" exact={true}>
-            <Dashboard></Dashboard>
-          </Route>
-          <Route path="/login" exact={true}>
-            <Login />
-          </Route>
-          <Route path="*">
-            <Error />
-          </Route>
-        </Switch>
-      </Router>
+      <AuthWrapper>
+        <Router>
+          <Switch>
+            <PrivateRoute path="/" exact={true}>
+              <Dashboard></Dashboard>
+            </PrivateRoute>
+            <Route path="/login" exact={true}>
+              <Login />
+            </Route>
+            <Route path="*">
+              <Error />
+            </Route>
+          </Switch>
+        </Router>
+      </AuthWrapper>
     </div>
   );
 }
